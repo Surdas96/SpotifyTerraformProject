@@ -1,0 +1,100 @@
+Spotify Project using Terraform
+
+-Create one folder in Local system
+-Name SpotifyTerraformProject
+-Open in VS code
+-Now create provide file -provider.tf under project folder
+-Search on google terraform providers -open terraform site and in search bar
+-search spotify provider you will get providers names -choose spotify by:conradludgate
+-on right side click on use provide -copy code and paste in provider.tf file
+eg.
+ terraform {
+  required_providers {
+    spotify = {
+      source = "conradludgate/spotify"
+      version = "0.2.7"
+    }
+  }
+}
+
+provider "spotify" {
+  # Configuration options
+}
+
+#Under configuration options section you need to add api key to connect spotify account.
+
+-So after configuration options add below code
+api_key ="spot"   ("Spot" because we do not have key right now so create account on spotify developer)
+-use link https://developer.spotify.com/dashboard/
+-Create spotify account and login here and go to dashboard
+
+-Click on create app
+-Name My Playlist using terraform
+-Description -Create multiple spotify playlist using terraform
+-Redirect URL -http://localhost:27228/spotify_callback
+-Tick I understand and save
+-Click on setting 
+(You will get client id and client secret to connect terraform to spotify and get api key )
+
+-Now we need to create environment for client id and secret 
+-go to vs code create file .env and paste below code and also paste your client id and secret between them.
+
+SPOTIFY_CLIENT_ID=<your_spotify_client_id>
+SPOTIFY_CLIENT_SECRET=<your_spotify_client_secret>
+
+Save (ctrl s )
+ 
+-Now we need to run spotify auth proxy as docker container 
+(which will help to connect terraform and spotify) 
+for that open docker desktop in background and run below command in terminal of VS code.
+
+docker run --rm -it -p 27228:27228 --env-file .env ghcr.io/conradludgate/spotify-auth-proxy
+(Here we are creating docker container which have docker image name - ghcr.io/conradludgate/spotify-auth-proxy:latest
+in docker you will see image and container created )
+
+-After successful running you will get APIKey and Auth URL. 
+-Copy auth link open in new tab and click on agree.
+-we have to use that key in provider.tf file under api_key section but we directly not user key as it is
+-we have to create variable then we can use.
+-make changes under configuration option (provider.tf file)
+
+  api_key= var.api_key
+
+-create terraform.tfvars file and add below
+ api_key= "INX1p_3sfDGlGjkaFTuV-C9eVjk0t_z8PJPl9N0kDgrUAoHt6IELTUUZUEauDNZx"
+Paste your terminal key inside ""
+
+-Now call this variable in side variable block 
+-create variable.tf file 
+write code
+variable "api_key" {
+   type = string
+}
+
+-save each file ctrl S
+
+-On terminal run terraform init command
+
+-Open spotify in your tab with your account created
+-There you will see no playlist available.
+-To create playlist go to vs code and crate playlist.tf file and add below codes.
+
+   resource "spotify_playlist" "My song list" {
+      name = "My song list"
+      tracks = ["Track id"] 
+}
+-Save file
+(My song list is a name of playlist which one you want to create)
+(search in any song name in spotify and open that in the URL section you will get track id after/track copy that and paste above code)
+(for example ["5fq7CGNYZKJm38HbLwMg9h"] this is id of ek din aap song )
+
+-Now run terraform plan
+-You will see all details in terminal
+
+-Now run terraform apply
+-Enter value -Yes
+
+-If you refresh spotify you will see playlist added and song added.
+
+-Finish
+---------------------------------------------------------
